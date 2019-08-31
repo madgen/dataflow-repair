@@ -1,0 +1,8 @@
+Ancestor(x,y) :- Parent(x,y).
+Ancestor(x,z) :- Ancestor(y,z), Parent(x,y).
+
+P(1).
+
+Res(x)  :- P(x, x), Q(x, 42).
+Q(x, x) :- R(x), S(x).
+R(x)    :- T(x).
