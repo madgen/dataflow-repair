@@ -23,67 +23,69 @@ analyze ('Program) {
     INT(constantID,constant),
     ID(predID, predName).
 
-  NotSideAux($pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
-    <: ... :- ..., $pred1(...,$ix1:$x,...),
-              ..., $pred2(...,$ix2:$y,...),
-              ..., $pred3(...,$ix3:$z,...),... .:>.
-  NotSideAux($pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
-    <: ... :- ..., $pred1(...,$ix1:$x,...),
-              ..., NOT($pred2(...,$ix2:$y,...)),
-              ..., $pred3(...,$ix3:$z,...),... .:>.
-#  NotSideAux($pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
-#    <: ... :- ..., $pred1(...,$ix1:$x,...),
-#              ..., $pred2(...,$ix2:$y,...),
-#              ..., NOT($pred3(...,$ix3:$z,...)),... .:>.
-  NotSideAux($pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
-    <: ... :- ..., $pred1(...,$ix1:$x,...),
-              ..., NOT($pred2(...,$ix2:$y,...)),
-              ..., NOT($pred3(...,$ix3:$z,...)),... .:>.
+  NotSideAux($pix1,$pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
+    <: ... :- ..., $pix1:$pred1(...,$ix1:$x,...),
+              ..., $pix2:$pred2(...,$ix2:$y,...),
+              ..., $pix3:$pred3(...,$ix3:$z,...),... .:>.
+  NotSideAux($pix1,$pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
+    <: ... :- ..., $pix1:$pred1(...,$ix1:$x,...),
+              ..., $pix2:NOT($pred2(...,$ix2:$y,...)),
+              ..., $pix3:$pred3(...,$ix3:$z,...),... .:>.
+#  NotSideAux($pix1,$pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
+#    <: ... :- ..., $pix1:$pred1(...,$ix1:$x,...),
+#              ..., $pix2:$pred2(...,$ix2:$y,...),
+#              ..., $pix3:NOT($pred3(...,$ix3:$z,...)),... .:>.
+  NotSideAux($pix1,$pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
+    <: ... :- ..., $pix1:$pred1(...,$ix1:$x,...),
+              ..., $pix2:NOT($pred2(...,$ix2:$y,...)),
+              ..., $pix3:NOT($pred3(...,$ix3:$z,...)),... .:>.
 
   NotSide(predName,ix1,pred3,ix3) :-
-    NotSideAux(pred1,pred3,x,y,z,ix1,ix3),
+    NotSideAux(pix1,pix2,pix3,pred1,pred3,x,y,z,ix1,ix3),
     ID(x,varName), ID(y,varName), ID(z,varName),
-    LT(x,y), LT(y,z),
+    LT(pix1,pix2), LT(pix2,pix3),
     ID(pred1,predName).
 
-  SideAux($pred1,$pred2,$ix1,$ix2,$x,$y) :-
-    <: ... :- ..., $pred1(...,$ix1:$x,...),
-              ..., $pred2(...,$ix2:$y,...),... .:>.
-  SideAux($pred1,$pred2,$ix1,$ix2,$x,$y) :-
-    <: ... :- ..., $pred1(...,$ix1:$x,...),
-              ..., NOT($pred2(...,$ix2:$y,...)),... .:>.
+  SideAux($pix1,$pix2,$pred1,$pred2,$ix1,$ix2,$x,$y) :-
+    <: ... :- ..., $pix1:$pred1(...,$ix1:$x,...),
+              ..., $pix2:$pred2(...,$ix2:$y,...),... .:>.
+  SideAux($pix1,$pix2,$pred1,$pred2,$ix1,$ix2,$x,$y) :-
+    <: ... :- ..., $pix1:$pred1(...,$ix1:$x,...),
+              ..., $pix2:NOT($pred2(...,$ix2:$y,...)),... .:>.
 
-  Side(predName,ix1,pred2,ix2) :-
-    SideAux(pred1,pred2,ix1,ix2,x,y),
+  Side(predName1,ix1,pred2,ix2) :-
+    SideAux(pix1,pix2,pred1,pred2,ix1,ix2,x,y),
     ID(x,varName), ID(y,varName),
-    LT(pred1,pred2),
-    LT(x,y),
-    ID(pred1,predName), NOT(NotSide(predName,ix1,pred2,ix2)).
+    LT(pix1,pix2),
+    ID(pred1,predName1), NOT(NotSide(predName1,ix1,pred2,ix2)).
+
+  SideDebug(predName1,ix1,pred2,predName2,ix2) :-
+    Side(predName1,ix1,pred2,ix2), ID(pred2,predName2).
 
   Out(predName1,ix1,predName2,ix2) :-
     Side(predName1,ix1,pred2,ix2), ID(pred2,predName2), Intensional(predName2).
 
-  NotInAux($pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
+  NotInAux($pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
     <: ..., $pred1(...,$ix1:$x,...), ...
-        :- ..., $pred2(...,$ix2:$y,...),
-           ..., $pred3(...,$ix3:$z,...),... .:>.
-  NotInAux($pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
+        :- ..., $pix2:$pred2(...,$ix2:$y,...),
+           ..., $pix3:$pred3(...,$ix3:$z,...),... .:>.
+  NotInAux($pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
     <: ..., $pred1(...,$ix1:$x,...), ...
-        :- ..., NOT($pred2(...,$ix2:$y,...)),
-           ..., $pred3(...,$ix3:$z,...),... .:>.
-#  NotInAux($pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
+        :- ..., $pix2:NOT($pred2(...,$ix2:$y,...)),
+           ..., $pix3:$pred3(...,$ix3:$z,...),... .:>.
+#  NotInAux($pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
 #    <: ..., $pred1(...,$ix1:$x,...), ...
-#        :- ..., $pred2(...,$ix2:$y,...),
-#           ..., NOT($pred3(...,$ix3:$z,...)),... .:>.
-  NotInAux($pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
+#        :- ..., $pix2:$pred2(...,$ix2:$y,...),
+#           ..., $pix3:NOT($pred3(...,$ix3:$z,...)),... .:>.
+  NotInAux($pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
     <: ..., $pred1(...,$ix1:$x,...), ...
-        :- ..., NOT($pred2(...,$ix2:$y,...)),
-           ..., NOT($pred3(...,$ix3:$z,...)),... .:>.
+        :- ..., $pix2:NOT($pred2(...,$ix2:$y,...)),
+           ..., $pix3:NOT($pred3(...,$ix3:$z,...)),... .:>.
 
   NotIn(predName,ix1,pred3,ix3) :-
-    NotInAux(pred1,pred3,x,y,z,ix1,ix3),
+    NotInAux(pix2,pix3,pred1,pred3,x,y,z,ix1,ix3),
     ID(x,varName), ID(y,varName), ID(z,varName),
-    LT(y,z),
+    LT(pix2,pix3),
     ID(pred1,predName).
 
   InAux($pred1,$pred2,$ix1,$ix2,$x,$y) :-
@@ -91,13 +93,34 @@ analyze ('Program) {
   InAux($pred1,$pred2,$ix1,$ix2,$x,$y) :-
     <: ...,$pred1(...,$ix1:$x,...),... :- ...,NOT($pred2(...,$ix2:$y,...)),... .:>.
 
-  In(predName,ix1,pred2,ix2) :-
+  In(predName1,ix1,pred2,ix2) :-
     InAux(pred1,pred2,ix1,ix2,x,y),
     ID(x,varName), ID(y,varName),
-    ID(pred1,predName), NOT(NotIn(predName,ix1,pred2,ix2)).
+    ID(pred1,predName1), NOT(NotIn(predName1,ix1,pred2,ix2)).
+
+  InDebug(predName1,ix1,pred2,predName2,ix2) :-
+    In(predName1,ix1,pred2,ix2), ID(pred2,predName2).
 
   Through(predName1,ix1,predName2,ix2) :-
     In(predName1,ix1,pred2,ix2), ID(pred2,predName2), Intensional(predName2).
+
+  OpenAuxAtom($predID,$ix) :- <: ... :- ...,$predID(...,$ix:$x,...),... .:>.
+  OpenAuxAtom($predID,$ix) :- <: ... :- ...,NOT($predID(...,$ix:$x,...)),... .:>.
+
+  OpenAtom(predID,ix) :-
+    OpenAuxAtom(predID,ix),
+    NOT(Side(_,_,predID,ix)),
+    NOT(In(_,_,predID,ix)),
+    ID(predID,predName),
+    NOT(ConstStr(_,predName,ix)),
+    NOT(ConstInt(_,predName,ix)).
+
+  OpenAtomDebug(predID,predName,ix) :- OpenAtom(predID,ix), ID(predID,predName).
+
+  OpenPred(predName,ix) :-
+    OpenAtom(predID,ix),
+    ID(predID,predName),
+    Intensional(predName).
 }
 
 OUTPUT('ConstStr).
@@ -108,3 +131,9 @@ OUTPUT('Out).
 OUTPUT('NotIn).
 OUTPUT('In).
 OUTPUT('Through).
+OUTPUT('OpenAtom).
+OUTPUT('OpenPred).
+
+OUTPUT('SideDebug).
+OUTPUT('InDebug).
+OUTPUT('OpenAtomDebug).
