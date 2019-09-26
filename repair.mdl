@@ -37,10 +37,6 @@ analyze ('Program) {
     <: ... :- ..., $pix1:$pred1(...,$ix1:$x,...),
               ..., $pix2:NOT($pred2(...,$ix2:$y,...)),
               ..., $pix3:$pred3(...,$ix3:$z,...),... .:>.
-  NotSideAux($pix1,$pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
-    <: ... :- ..., $pix1:$pred1(...,$ix1:$x,...),
-              ..., $pix2:NOT($pred2(...,$ix2:$y,...)),
-              ..., $pix3:NOT($pred3(...,$ix3:$z,...)),... .:>.
 
   NotSide(predName,ix1,pred3,ix3) :-
     NotSideAux(pix1,pix2,pix3,pred1,pred3,x,y,z,ix1,ix3),
