@@ -28,6 +28,7 @@ analyze ('Program) {
     INT(constantID,constant),
     ID(predID, predName).
 
+  # No pred2, ..., NOT pred3 pattern because syntactic ordering is ignored.
   NotSideAux($pix1,$pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
     <: ... :- ..., $pix1:$pred1(...,$ix1:$x,...),
               ..., $pix2:$pred2(...,$ix2:$y,...),
@@ -36,10 +37,6 @@ analyze ('Program) {
     <: ... :- ..., $pix1:$pred1(...,$ix1:$x,...),
               ..., $pix2:NOT($pred2(...,$ix2:$y,...)),
               ..., $pix3:$pred3(...,$ix3:$z,...),... .:>.
-#  NotSideAux($pix1,$pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
-#    <: ... :- ..., $pix1:$pred1(...,$ix1:$x,...),
-#              ..., $pix2:$pred2(...,$ix2:$y,...),
-#              ..., $pix3:NOT($pred3(...,$ix3:$z,...)),... .:>.
   NotSideAux($pix1,$pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
     <: ... :- ..., $pix1:$pred1(...,$ix1:$x,...),
               ..., $pix2:NOT($pred2(...,$ix2:$y,...)),
@@ -70,6 +67,7 @@ analyze ('Program) {
   Out(predName1,ix1,predName2,ix2) :-
     Side(predName1,ix1,pred2,ix2), ID(pred2,predName2), Intensional(predName2).
 
+  # No pred2, ..., NOT pred3 pattern because syntactic ordering is ignored.
   NotInAux($pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
     <: ..., $pred1(...,$ix1:$x,...), ...
         :- ..., $pix2:$pred2(...,$ix2:$y,...),
@@ -78,10 +76,6 @@ analyze ('Program) {
     <: ..., $pred1(...,$ix1:$x,...), ...
         :- ..., $pix2:NOT($pred2(...,$ix2:$y,...)),
            ..., $pix3:$pred3(...,$ix3:$z,...),... .:>.
-#  NotInAux($pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
-#    <: ..., $pred1(...,$ix1:$x,...), ...
-#        :- ..., $pix2:$pred2(...,$ix2:$y,...),
-#           ..., $pix3:NOT($pred3(...,$ix3:$z,...)),... .:>.
   NotInAux($pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
     <: ..., $pred1(...,$ix1:$x,...), ...
         :- ..., $pix2:NOT($pred2(...,$ix2:$y,...)),
