@@ -6,6 +6,7 @@ Q(x, x) :- R(x), S(x).
 R(x)    :- T(x).
 
 # Expected results
+
 # Out:
 # (P,1) to (Q,0)
 
@@ -29,7 +30,7 @@ R(x)    :- T(x).
 # (Q,1)        to (R,0)
 
 # ConstInt:
-# ID(C3:Q(x, 42)) to 42
+# 42 to (Q,1)
 
 # ConstStr:
 
