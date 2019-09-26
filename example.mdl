@@ -1,7 +1,7 @@
 Ancestor(x,y) :- Parent(x,y).
 Ancestor(x,z) :- Ancestor(y,z), Parent(x,y).
 
-Res(y)  :- P(x, x), Q(x, 42).
+Res(y)  :- P(x, x), T(z), Q(x, 42).
 Q(x, x) :- R(x), S(x).
 R(x)    :- T(x).
 
@@ -37,9 +37,11 @@ R(x)    :- T(x).
 # (C2:Ancestor(y,z),0)
 # (C3:P(x,x),0)
 # (C3:P(x,x),1)
+# (C3:T(z,x),1)
 
 # OpenPred:
 # (Ancestor,0)
 # (P,0)
 # (P,1)
 # (Res,0)
+# (T,0)
