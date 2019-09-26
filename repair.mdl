@@ -5,15 +5,13 @@ IMPORT("../repair/example.mdl", 'Program).
 # data Feature = CInt Int | CStr Str | (Pred,Int) | (Atom,Int)
 
 analyze ('Program) {
-  HeadPredIx(predName, $ix) :-
+  Intensional(predName), HeadPredIx(predName, $ix) :-
     <: ..., $pred(...,$ix:$x,...), ... :- ... .:>, ID($pred,predName).
 
-  Intensional(predName) :- HeadPredIx(predName,_).
-
-  BodyAtomIx($predID,$ix) :- <: ... :- ...,$predID(...,$ix:$x,...),... .:>.
-  BodyAtomIx($predID,$ix) :- <: ... :- ...,NOT($predID(...,$ix:$x,...)),... .:>.
-
-  BodyAtom(atomID) :- BodyAtomIx(atomID,_).
+  BodyAtom($predID), BodyAtomIx($predID,$ix) :-
+    <: ... :- ...,$predID(...,$ix:$x,...),... .:>.
+  BodyAtom($predID), BodyAtomIx($predID,$ix) :-
+    <: ... :- ...,NOT($predID(...,$ix:$x,...)),... .:>.
 
   ConstAux($pred,$ix,$constant) :-
     <: ... :- ..., $pred(...,$ix:$constant,...), ... .:>.
