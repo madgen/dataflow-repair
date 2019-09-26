@@ -5,8 +5,15 @@ IMPORT("../repair/example.mdl", 'Program).
 # data Feature = CInt Int | CStr Str | (Pred,Int) | (Atom,Int)
 
 analyze ('Program) {
-  Intensional(predName) :-
-    <: ..., $pred(...), ... :- ... .:>, ID($pred,predName).
+  HeadPredIx(predName, $ix) :-
+    <: ..., $pred(...,$ix:$x,...), ... :- ... .:>, ID($pred,predName).
+
+  Intensional(predName) :- HeadPredIx(predName,_).
+
+  BodyAtomIx($predID,$ix) :- <: ... :- ...,$predID(...,$ix:$x,...),... .:>.
+  BodyAtomIx($predID,$ix) :- <: ... :- ...,NOT($predID(...,$ix:$x,...)),... .:>.
+
+  BodyAtom(atomID) :- BodyAtomIx(atomID,_).
 
   ConstAux($pred,$ix,$constant) :-
     <: ... :- ..., $pred(...,$ix:$constant,...), ... .:>.
@@ -104,11 +111,8 @@ analyze ('Program) {
   Through(predName1,ix1,predName2,ix2) :-
     In(predName1,ix1,pred2,ix2), ID(pred2,predName2), Intensional(predName2).
 
-  OpenAuxAtom($predID,$ix) :- <: ... :- ...,$predID(...,$ix:$x,...),... .:>.
-  OpenAuxAtom($predID,$ix) :- <: ... :- ...,NOT($predID(...,$ix:$x,...)),... .:>.
-
   OpenAtom(predID,ix) :-
-    OpenAuxAtom(predID,ix),
+    BodyAtomIx(predID,ix),
     NOT(Side(_,_,predID,ix)),
     NOT(In(_,_,predID,ix)),
     ID(predID,predName),
@@ -118,9 +122,14 @@ analyze ('Program) {
   OpenAtomDebug(predID,predName,ix) :- OpenAtom(predID,ix), ID(predID,predName).
 
   OpenPred(predName,ix) :-
+    HeadPredIx(predName,ix),
+    NOT(Out(_,_,predName,ix)),
+    NOT(Through(_,_,predName,ix)),
+    NOT(ConstStr(_,predName,ix)),
+    NOT(ConstInt(_,predName,ix)).
+  OpenPred(predName,ix) :-
     OpenAtom(predID,ix),
-    ID(predID,predName),
-    Intensional(predName).
+    ID(predID,predName).
 }
 
 OUTPUT('ConstStr).
