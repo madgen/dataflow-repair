@@ -4,3 +4,26 @@ Ancestor(x,z) :- Ancestor(y,z), Parent(x,y).
 Res(y)  :- P(x, x), Q(x, 42).
 Q(x, x) :- R(x), S(x).
 R(x)    :- T(x).
+
+# Expected results
+# Out:
+# (P,1) to (Q,0)
+
+# Side
+# (Ancestor,0) to (ID(C2:Parent(x,y)),1)
+# (P,1) to (ID(C4:Q(x, 42)),0)
+# (R,0) to (ID(C5:S(x)),0)
+
+# In:
+# (Ancestor,0) to (ID(C1:Parent(x,y)),0)
+# (Ancestor,1) to (ID(C1:Parent(x,y)),1)
+# (Ancestor,0) to (ID(C2:Parent(x,y)),0)
+# (Ancestor,1) to (ID(C2:Ancestor(y,z)),1)
+# (Q,0) to (ID(C4:R(x)),0)
+# (Q,1) to (ID(C4:R(x)),0)
+# (R,0) to (ID(C5:T(x)),0)
+
+# Through:
+# (Ancestor,1) to (Ancestor,1)
+# (Q,0) to (R,0)
+# (Q,1) to (R,0)
