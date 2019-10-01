@@ -1,4 +1,4 @@
-IMPORT("../repair/example.mdl", 'Program).
+IMPORT("../repair/examples/flow.mdl", 'Program).
 
 # For feature extraction we need
 #
