@@ -7,6 +7,33 @@ R(x)    :- T(x).
 
 # Expected results
 
+## Derived stuff
+
+# Open predicates:
+# (Res,0), (P,0), (P,1), (T,0), (Ancestor,0)
+
+# Open atoms:
+# (P,0), (P,1), (T,0), (Ancestor,0)
+
+# Const to pred flow:
+# 42 -> (Q,0), (R,0)
+
+# Const to atom flow:
+# 42 -> (R(x),0), (T(x),0)
+
+# Predicate to predicate flow:
+# (P,1) to (Q,0)
+# (P,1) to (R,0)
+
+# Predicate to atom flow:
+# (Ancestor,0) to (Parent(x,y),1)
+# (P,1) to (Q(x,42),0)
+# (P,1) to (R(x),0)
+# (P,1) to (T(x),0)
+# (R,0) to (S(x),0)
+
+## Base stuff
+
 # Out:
 # (P,1) to (Q,0)
 
