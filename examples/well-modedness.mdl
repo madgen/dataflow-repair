@@ -1,0 +1,6 @@
+WellModedEx1(x) :- P(x), NOT(Q(x)).
+WellModedEx2(x) :- P(x), NOT(Q(x)), NOT(R(x)).
+
+IllModedEx1(x)  :- P(x), NOT(Q(y)).
+IllModedEx2(x)  :- P(x), NOT(Q(y)), R(y).
+IllModedEx3(x)  :- NOT(Q(x)).

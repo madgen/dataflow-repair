@@ -1,0 +1,33 @@
+IMPORT("../repair/examples/well-modedness.mdl", 'Program).
+
+analyze ('Program) {
+  Follows($q,$p) :- <: ... :- ..., $p(...), $q(...), ... .:>.
+  Follows($q,$p) :- <: ... :- ..., NOT($p(...)), $q(...), ... .:>.
+  Follows($q,$p) :- <: ... :- ..., $p(...), NOT($q(...)), ... .:>.
+  Follows($q,$p) :- <: ... :- ..., NOT($p(...)), NOT($q(...)), ... .:>.
+
+  BoundVars($p,varName) :-
+    <: ... :- ..., $p(...,$x,...), ... .:>,
+    ID($x,varName).
+  BoundVars(q, varName) :- Follows(q,p), BoundVars(p,varName).
+
+  IllModedAtom($p,$ix) :-
+    <: ... :- ..., NOT($p(...,$ix:$x,...)), ... .:>,
+    ID($x, varName),
+    NOT(BoundVars($p,varName)).
+
+  IllModedClause(pName,src) :-
+    <: ..., $p(...), ... :- ..., NOT($q(...)), ... .:>,
+    IllModedAtom($q,_),
+    ID($p,pName),
+    SRC($p,src).
+
+  WellModedClause(pName,src) :-
+    <: ..., $p(...), ... :- ... .:>,
+    ID($p,pName),
+    NOT(IllModedClause(pName,_)),
+    SRC($p,src).
+}
+
+OUTPUT('IllModedClause).
+OUTPUT('WellModedClause).
