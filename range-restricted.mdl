@@ -1,0 +1,19 @@
+IMPORT("../repair/examples/range-restricted.mdl", 'Program).
+
+analyze ('Program) {
+  RangeRestrictedVar($p,$ix) :-
+    <: ..., $p(...,$ix:$x,...), ... :- ..., $q(...,$y,...), ... .:>,
+    ID($x,varName),
+    ID($y,varName).
+
+  NonRangeRestrictedHead($p,$ix) :-
+    <: ..., $p(...,$ix:$x,...), ... :- ... .:>,
+    NOT(RangeRestrictedVar($p,$ix)).
+
+  NonRangeRestrictedClause(pName,src) :-
+    NonRangeRestrictedHead(p,ix),
+    ID(p,pName),
+    SRC(p,src).
+}
+
+OUTPUT('NonRangeRestrictedClause).

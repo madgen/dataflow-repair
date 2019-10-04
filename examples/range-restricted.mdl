@@ -1,0 +1,7 @@
+RangeRestrictedEx1(x,y) :- P(x), Q(y).
+RangeRestrictedEx2(x,x) :- P(x).
+
+NonRangeRestrictedEx1(x,y) :- Q(x).
+NonRangeRestrictedEx2(x,y) :- P(x), NOT(Q(y)).
+NonRangeRestrictedEx3(x,y) :- NOT(R(x,y)).
+NonRangeRestrictedEx4(x,x) :- Q(y).
