@@ -1,0 +1,36 @@
+IMPORT("../repair/examples/master.mdl", 'Program).
+
+EDB('NonRangeRestricted,"NonRangeRestricted.csv").
+EDB('ConstStrToPredFlow,"ConstStrToPredFlow.csv").
+EDB('ConstIntToPredFlow,"ConstIntToPredFlow.csv").
+EDB('PredToPredFlow    ,"PredToPredFlow.csv").
+EDB('OpenToPredFlow    ,"OpenToPredFlow.csv").
+
+NonRangeRestricted("","",0) :- NEQ(0,0).
+ConstStrToPredFlow("","",0) :- NEQ(0,0).
+ConstIntToPredFlow(0,"",0)  :- NEQ(0,0).
+PredToPredFlow("",0,"",0)   :- NEQ(0,0).
+OpenToPredFlow("",0)        :- NEQ(0,0).
+
+analyze ('Program) {
+  RangeRestrictable(src,headName,ix) :-
+    NonRangeRestricted(src,headName,ix),
+    NOT(OpenToPredFlow(headName,ix)).
+
+  RangeRestrictableDomainStr(headName,ix,constant) :-
+    RangeRestrictable(_,headName,ix),
+    ConstStrToPredFlow(constant,headName,ix).
+
+  RangeRestrictableDomainInt(headName,ix,constant) :-
+    RangeRestrictable(_,headName,ix),
+    ConstIntToPredFlow(constant,headName,ix).
+
+  RangeRestrictableDomainPred(headName,headIx,srcName,srcIx) :-
+    RangeRestrictable(_,headName,headIx),
+    PredToPredFlow(srcName,srcIx,headName,headIx).
+}
+
+OUTPUT('RangeRestrictable).
+OUTPUT('RangeRestrictableDomainStr).
+OUTPUT('RangeRestrictableDomainInt).
+OUTPUT('RangeRestrictableDomainPred).
