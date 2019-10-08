@@ -1,0 +1,26 @@
+### Example 1
+# Domain of RangeRestrictable1 is 42 and (P,1)
+
+RangeRestrictable1Aux(z) :- P(z), RangeRestrictable1(z).
+RangeRestrictable1Aux(z) :- RangeRestrictable1(42).
+
+RangeRestrictable1(x)  :- P(y).
+
+### Example 2
+# NonRangeRestrictable1 is not range restrictable
+
+NonRangeRestrictable1Aux(z) :- NonRangeRestrictable1(z).
+NonRangeRestrictable1Aux(z) :- NonRangeRestrictable1(42).
+
+NonRangeRestrictable1(x)  :- P(y).
+
+### Example 3
+# Domain of RangeRestrictable2 is (Q,1)
+
+RangeRestrictable2Aux2(x) :- P(x), Q(z), RangeRestrictable2Aux1(x).
+
+RangeRestrictable2Aux1(z) :- RangeRestrictable2(z).
+RangeRestrictable2Aux1(z) :- RangeRestrictable2(z).
+
+RangeRestrictable2(x)  :- P(y).
+
