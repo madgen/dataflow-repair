@@ -1,3 +1,7 @@
+################################################################################
+## Range restriction examples
+################################################################################
+
 ### Example 1
 # Domain of RangeRestrictable1 is 42 and (P,1)
 
@@ -24,3 +28,10 @@ RangeRestrictable2Aux1(z) :- RangeRestrictable2(z).
 
 RangeRestrictable2(x)  :- P(y).
 
+################################################################################
+## Well moding examples
+################################################################################
+
+WellModable1Aux(z) :- P(z), WellModable1(42,z).
+
+WellModable1(x,y) :- P(x), NOT(Q(y)).

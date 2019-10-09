@@ -1,0 +1,36 @@
+IMPORT("../repair/examples/master.mdl", 'Program).
+
+EDB('IllModed,"IllModed.csv").
+EDB('ConstStrToAtomFlow,"ConstStrToAtomFlow.csv").
+EDB('ConstIntToAtomFlow,"ConstIntToAtomFlow.csv").
+EDB('PredToAtomFlow    ,"PredToAtomFlow.csv").
+EDB('OpenToAtomFlow    ,"OpenToAtomFlow.csv").
+
+IllModed("",0,0)           :- NEQ(0,0).
+ConstStrToAtomFlow("",0,0) :- NEQ(0,0).
+ConstIntToAtomFlow(0,0,0)  :- NEQ(0,0).
+PredToAtomFlow("",0,0,0)   :- NEQ(0,0).
+OpenToAtomFlow(0,0)        :- NEQ(0,0).
+
+analyze ('Program) {
+  WellModable(src,atomID,ix) :-
+    IllModed(src,atomID,ix),
+    NOT(OpenToAtomFlow(atomID,ix)).
+
+  WellModableDomainStr(atomID,ix,constant) :-
+    WellModable(_,atomID,ix),
+    ConstStrToAtomFlow(constant,atomID,ix).
+
+  WellModableDomainInt(atomID,ix,constant) :-
+    WellModable(_,atomID,ix),
+    ConstIntToAtomFlow(constant,atomID,ix).
+
+  WellModableDomainPred(atomID,atomIx,srcName,srcIx) :-
+    WellModable(_,atomID,atomIx),
+    PredToAtomFlow(srcName,srcIx,atomID,atomIx).
+}
+
+OUTPUT('WellModable).
+OUTPUT('WellModableDomainStr).
+OUTPUT('WellModableDomainInt).
+OUTPUT('WellModableDomainPred).
