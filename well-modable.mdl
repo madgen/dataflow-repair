@@ -6,28 +6,28 @@ EDB('ConstIntToAtomFlow,"ConstIntToAtomFlow.csv").
 EDB('PredToAtomFlow    ,"PredToAtomFlow.csv").
 EDB('OpenToAtomFlow    ,"OpenToAtomFlow.csv").
 
-IllModed("",0,0)           :- NEQ(0,0).
-ConstStrToAtomFlow("",0,0) :- NEQ(0,0).
-ConstIntToAtomFlow(0,0,0)  :- NEQ(0,0).
-PredToAtomFlow("",0,0,0)   :- NEQ(0,0).
-OpenToAtomFlow(0,0)        :- NEQ(0,0).
+IllModed("",0)              :- NEQ(0,0).
+ConstStrToAtomFlow("","",0) :- NEQ(0,0).
+ConstIntToAtomFlow(0,"",0)  :- NEQ(0,0).
+PredToAtomFlow("",0,"",0)   :- NEQ(0,0).
+OpenToAtomFlow("",0)        :- NEQ(0,0).
 
 analyze ('Program) {
-  WellModable(src,atomID,ix) :-
-    IllModed(src,atomID,ix),
-    NOT(OpenToAtomFlow(atomID,ix)).
+  WellModable(src,ix) :-
+    IllModed(src,ix),
+    NOT(OpenToAtomFlow(src,ix)).
 
-  WellModableDomainStr(atomID,ix,constant) :-
-    WellModable(_,atomID,ix),
-    ConstStrToAtomFlow(constant,atomID,ix).
+  WellModableDomainStr(src,ix,constant) :-
+    WellModable(src,ix),
+    ConstStrToAtomFlow(constant,src,ix).
 
-  WellModableDomainInt(atomID,ix,constant) :-
-    WellModable(_,atomID,ix),
-    ConstIntToAtomFlow(constant,atomID,ix).
+  WellModableDomainInt(src,ix,constant) :-
+    WellModable(src,ix),
+    ConstIntToAtomFlow(constant,src,ix).
 
-  WellModableDomainPred(atomID,atomIx,srcName,srcIx) :-
-    WellModable(_,atomID,atomIx),
-    PredToAtomFlow(srcName,srcIx,atomID,atomIx).
+  WellModableDomainPred(sinkSrc,sinkIx,srcName,srcIx) :-
+    WellModable(sinkSrc,sinkIx),
+    PredToAtomFlow(srcName,srcIx,sinkSrc,sinkIx).
 }
 
 OUTPUT('WellModable).

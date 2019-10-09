@@ -64,17 +64,17 @@ analyze ('Program) {
     <: ... :- ..., $pix1:$pred1(...,$ix1:$x,...),
               ..., $pix2:NOT($pred2(...,$ix2:$y,...)),... .:>.
 
-  Side(predName1,ix1,pred2,ix2) :-
-    SideAux(pix1,pix2,pred1,pred2,ix1,ix2,x,y),
+  Side(pred1Name,ix1,atom2Src,ix2), SideInternal(pred1Name,ix1,atom2,ix2) :-
+    SideAux(pix1,pix2,atom1,atom2,ix1,ix2,x,y),
     ID(x,varName), ID(y,varName),
     LT(pix1,pix2),
-    ID(pred1,predName1), NOT(NotSide(predName1,ix1,pred2,ix2)).
-
-  SideDebug(predName1,ix1,pred2,predName2,ix2) :-
-    Side(predName1,ix1,pred2,ix2), ID(pred2,predName2).
+    ID(atom1,pred1Name), NOT(NotSide(pred1Name,ix1,atom2,ix2)),
+    SRC(atom2,atom2Src).
 
   Out(predName1,ix1,predName2,ix2) :-
-    Side(predName1,ix1,pred2,ix2), ID(pred2,predName2), Intensional(predName2).
+    SideInternal(predName1,ix1,pred2,ix2),
+    ID(pred2,predName2),
+    Intensional(predName2).
 
   NotInAux($pix2,$pix3,$pred1,$pred3,$x,$y,$z,$ix1,$ix3) :-
     <: ..., $pred1(...,$ix1:$x,...), ...
@@ -98,26 +98,25 @@ analyze ('Program) {
   InAux($pred1,$pred2,$ix1,$ix2,$x,$y) :-
     <: ...,$pred1(...,$ix1:$x,...),... :- ...,NOT($pred2(...,$ix2:$y,...)),... .:>.
 
-  In(predName1,ix1,pred2,ix2) :-
-    InAux(pred1,pred2,ix1,ix2,x,y),
+  In(pred1Name,ix1,atom2Src,ix2), InInternal(pred1Name,ix1,atom2,ix2) :-
+    InAux(atom1,atom2,ix1,ix2,x,y),
     ID(x,varName), ID(y,varName),
-    ID(pred1,predName1), NOT(NotIn(predName1,ix1,pred2,ix2)).
-
-  InDebug(predName1,ix1,pred2,predName2,ix2) :-
-    In(predName1,ix1,pred2,ix2), ID(pred2,predName2).
+    ID(atom1,pred1Name), NOT(NotIn(pred1Name,ix1,atom2,ix2)),
+    SRC(atom2,atom2Src).
 
   Through(predName1,ix1,predName2,ix2) :-
-    In(predName1,ix1,pred2,ix2), ID(pred2,predName2), Intensional(predName2).
+    InInternal(predName1,ix1,pred2,ix2),
+    ID(pred2,predName2),
+    Intensional(predName2).
 
-  OpenAtom(atomID,ix) :-
+  OpenAtom(atomSrc,ix), OpenAtomaInternal(atomID,ix) :-
     BodyAtomIx(atomID,ix),
-    NOT(Side(_,_,atomID,ix)),
-    NOT(In(_,_,atomID,ix)),
+    NOT(SideInternal(_,_,atomID,ix)),
+    NOT(InInternal(_,_,atomID,ix)),
     ID(atomID,predName),
     NOT(ConstStr(_,predName,ix)),
-    NOT(ConstInt(_,predName,ix)).
-
-  OpenAtomDebug(predID,predName,ix) :- OpenAtom(predID,ix), ID(predID,predName).
+    NOT(ConstInt(_,predName,ix)),
+    SRC(atomID,atomSrc).
 
   OpenPred(predName,ix) :-
     HeadPredIx(predName,ix),
@@ -126,68 +125,54 @@ analyze ('Program) {
     NOT(ConstStr(_,predName,ix)),
     NOT(ConstInt(_,predName,ix)).
   OpenPred(predName,ix) :-
-    OpenAtom(predID,ix),
-    ID(predID,predName).
+    OpenAtomInternal(atomID,ix),
+    ID(atomID,predName).
+}
 
 # Abstract flow connecting predicates via Throughs
-  Bridge(p,pix,q,qix) :- Through(p,pix,q,qix).
-  Bridge(p,pix,q,qix) :- Through(p,pix,r,rix), Bridge(r,rix,q,qix).
+Bridge(p,pix,q,qix) :- Through(p,pix,q,qix).
+Bridge(p,pix,q,qix) :- Through(p,pix,r,rix), Bridge(r,rix,q,qix).
 
 ## Constants flow into predicates and atoms through a bridge.
 #
 # Integer Const -> Pred
-  ConstIntToPredFlow(int,p,pix) :- ConstInt(int,p,pix).
-  ConstIntToPredFlow(int,p,pix) :- ConstInt(int,r,rix), Bridge(r,rix,p,pix).
+ConstIntToPredFlow(int,p,pix) :- ConstInt(int,p,pix).
+ConstIntToPredFlow(int,p,pix) :- ConstInt(int,r,rix), Bridge(r,rix,p,pix).
 
 # Integer Const -> Atom
-  ConstIntToAtomFlow(int,a,aix) :- ConstIntToPredFlow(int,p,pix), In(p,pix,a,aix).
-
-  ConstIntToAtomFlowDebug(int,a,aName,aix) :- ConstIntToAtomFlow(int,a,aix), ID(a,aName).
+ConstIntToAtomFlow(int,a,aix) :- ConstIntToPredFlow(int,p,pix), In(p,pix,a,aix).
 
 # String Const -> Pred
-  ConstStrToPredFlow(str,p,pix) :- ConstStr(str,p,pix).
-  ConstStrToPredFlow(str,p,pix) :- ConstStr(str,r,rix), Bridge(r,rix,p,pix).
+ConstStrToPredFlow(str,p,pix) :- ConstStr(str,p,pix).
+ConstStrToPredFlow(str,p,pix) :- ConstStr(str,r,rix), Bridge(r,rix,p,pix).
 
 # String Const -> Atom
-  ConstStrToAtomFlow(str,a,aix) :- ConstStrToPredFlow(str,p,pix), In(p,pix,a,aix).
-
-  ConstStrToAtomFlowDebug(str,a,aName,aix) :- ConstStrToAtomFlow(str,a,aix), ID(a,aName).
+ConstStrToAtomFlow(str,a,aix) :- ConstStrToPredFlow(str,p,pix), In(p,pix,a,aix).
 
 # Concrete flow from a predicate to another
-  PredToPredFlow(p,pix,q,qix) :- Out(p,pix,q,qix).
-  PredToPredFlow(p,pix,q,qix) :- Out(p,pix,r,rix), Bridge(r,rix,q,qix).
+PredToPredFlow(p,pix,q,qix) :- Out(p,pix,q,qix).
+PredToPredFlow(p,pix,q,qix) :- Out(p,pix,r,rix), Bridge(r,rix,q,qix).
 
 # Concrete flow from a predicate to an atom
-  PredToAtomFlow(p,pix,a,aix) :- PredToPredFlow(p,pix,q,qix), In(q,qix,a,aix).
-  PredToAtomFlow(p,pix,a,aix) :- Side(p,pix,a,aix).
-
-  PredToAtomFlowDebug(p,pix,a,aName,aix) :- PredToAtomFlow(p,pix,a,aix), ID(a,aName).
+PredToAtomFlow(p,pix,a,aix) :- PredToPredFlow(p,pix,q,qix), In(q,qix,a,aix).
+PredToAtomFlow(p,pix,a,aix) :- Side(p,pix,a,aix).
 
 # Openness taints every predicate connected with a bridge
-  OpenToPredFlow(p,pix) :- OpenPred(p,pix).
-  OpenToPredFlow(p,pix) :- OpenPred(o,oix), Bridge(o,oix,p,pix).
+OpenToPredFlow(p,pix) :- OpenPred(p,pix).
+OpenToPredFlow(p,pix) :- OpenPred(o,oix), Bridge(o,oix,p,pix).
 
 # We have open atoms and open predicates that flow into some atom via In.
-  OpenToAtomFlow(a,aix) :- OpenAtom(a,aix).
-  OpenToAtomFlow(a,aix) :- OpenToPredFlow(p,pix), In(p,pix,a,aix).
-
-  OpenToAtomFlowDebug(a,aName,aix) :- OpenToAtomFlow(a,aix), ID(a,aName).
-}
+OpenToAtomFlow(a,aix) :- OpenAtom(a,aix).
+OpenToAtomFlow(a,aix) :- OpenToPredFlow(p,pix), In(p,pix,a,aix).
 
 OUTPUT('ConstStr).
 OUTPUT('ConstInt).
-OUTPUT('NotSide).
 OUTPUT('Side).
 OUTPUT('Out).
-OUTPUT('NotIn).
 OUTPUT('In).
 OUTPUT('Through).
 OUTPUT('OpenAtom).
 OUTPUT('OpenPred).
-
-OUTPUT('SideDebug).
-OUTPUT('InDebug).
-OUTPUT('OpenAtomDebug).
 
 OUTPUT('ConstStrToPredFlow).
 OUTPUT('ConstStrToAtomFlow).
@@ -197,8 +182,3 @@ OUTPUT('PredToPredFlow).
 OUTPUT('PredToAtomFlow).
 OUTPUT('OpenToPredFlow).
 OUTPUT('OpenToAtomFlow).
-
-OUTPUT('ConstStrToAtomFlowDebug).
-OUTPUT('ConstIntToAtomFlowDebug).
-OUTPUT('PredToAtomFlowDebug).
-OUTPUT('OpenToAtomFlowDebug).

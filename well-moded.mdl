@@ -11,7 +11,7 @@ analyze ('Program) {
     ID($x,varName).
   BoundVars(q, varName) :- Follows(q,p), BoundVars(p,varName).
 
-  IllModed(src,$atomID,$ix) :-
+  IllModed(src,$ix) :-
     <: ... :- ..., NOT($atomID(...,$ix:$x,...)), ... .:>,
     ID($x, varName),
     NOT(BoundVars($atomID,varName)),

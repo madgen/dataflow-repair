@@ -32,6 +32,7 @@ RangeRestrictable2(x)  :- P(y).
 ## Well moding examples
 ################################################################################
 
-WellModable1Aux(z) :- P(z), WellModable1(42,z).
+WellModable1Aux1(z) :- P(z), WellModable1(42,z).
+WellModable1Aux2(z) :- WellModable1(42,"Mistral").
 
 WellModable1(x,y) :- P(x), NOT(Q(y)).
